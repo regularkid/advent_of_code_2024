@@ -24,3 +24,8 @@ puts case (1..100).to_a.sample
         else
             "One Hundred"
         end
+
+puts "." * 10
+
+f = "%{hello} world"
+puts f % {hello:"Hey"}
