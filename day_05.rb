@@ -1,7 +1,6 @@
 require 'set'
 
 mustComeAfterRules = {}
-mustComeBeforeRules = {}
 middlePageSum = 0
 fixedMiddlePageSum = 0
 File.readlines("day_05_input.txt").each do |line|
@@ -11,11 +10,7 @@ File.readlines("day_05_input.txt").each do |line|
         if !mustComeAfterRules.key?(pages[0])
             mustComeAfterRules[pages[0]] = Set.new
         end
-        if !mustComeBeforeRules.key?(pages[1])
-            mustComeBeforeRules[pages[1]] = Set.new
-        end
         mustComeAfterRules[pages[0]].add(pages[1])
-        mustComeBeforeRules[pages[1]].add(pages[0])
     when /(\d+,*)+/
         updateOrder = line.split(",").map(&:to_i)
         before = Set.new
@@ -45,8 +40,6 @@ File.readlines("day_05_input.txt").each do |line|
             updateOrder.sort! do |a,b|
                 if mustComeAfterRules.key?(a) && mustComeAfterRules[a].include?(b)
                     -1
-                elsif mustComeBeforeRules.key?(b) && mustComeBeforeRules[b].include?(a)
-                    1
                 else
                     1
                 end
