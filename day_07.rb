@@ -28,7 +28,7 @@ class Equation
         nextValue = remainingValues[0]
         return isSolvableInternal(lhs + nextValue, remainingValues[1..]) ||
                isSolvableInternal(lhs * nextValue, remainingValues[1..]) ||
-               (isSolvableInternal(combineValues(lhs, nextValue), remainingValues[1..]))
+               isSolvableInternal(combineValues(lhs, nextValue), remainingValues[1..])
     end
 
     def isSolvable
