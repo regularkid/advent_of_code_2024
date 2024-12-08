@@ -41,4 +41,26 @@ antennasByFreq.each do |antenna, locations|
     end
 end
 
+antinodesWithResonance = Set.new
+antennasByFreq.each do |antenna, locations|
+    locations.each_with_index do |locationA, indexA|
+        locations.each_with_index do |locationB, indexB|
+            if indexA == indexB
+                next
+            end
+
+            dx = locationB.x - locationA.x
+            dy = locationB.y - locationA.y
+            xAntinode = locationA.x + dx
+            yAntinode = locationA.y + dy
+            while xAntinode >= 0 && xAntinode < gridWidth && yAntinode >= 0 && yAntinode < gridHeight
+                antinodesWithResonance.add("#{xAntinode},#{yAntinode}")
+                xAntinode += dx
+                yAntinode += dy
+            end
+        end
+    end
+end
+
 puts "Part 1 Answer: #{antinodes.length}"
+puts "Part 2 Answer: #{antinodesWithResonance.length}"
