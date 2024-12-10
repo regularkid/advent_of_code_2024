@@ -1,13 +1,12 @@
 isFileDigit = true
+DiskMapSection = Struct.new(:fileId, :numBlocks)
 diskMap = []
 fileId = 0
 
 # Build non-compated disk map
-File.read("day_09_input_example.txt").chars do |c|
+File.read("day_09_input.txt").chars do |c|
     numBlocks = c.to_i
-    (1..numBlocks).each do
-        diskMap.append(isFileDigit ? fileId : -1)
-    end
+    diskMap.append(DiskMapSection.new(isFileDigit ? fileId : -1, numBlocks))
 
     if isFileDigit
         fileId += 1
@@ -15,46 +14,39 @@ File.read("day_09_input_example.txt").chars do |c|
     isFileDigit = !isFileDigit
 end
 
-# Compact disk map (part 1)
-# endIndex = diskMap.length - 1
-# (0...diskMap.length).each do |index|
-#     if diskMap[index] == -1
-#         diskMap[index] = diskMap[endIndex]
-#         diskMap[endIndex] = -1
-#         while endIndex > index && diskMap[endIndex] == -1
-#             endIndex -= 1
-#         end
-#     end
-
-#     if index >= endIndex
-#         break
-#     end
-# end
-
 # Compact disk map (part 2)
-endIndex = diskMap.length - 1
-(0...diskMap.length).each do |index|
-    if diskMap[index] == -1
-        diskMap[index] = diskMap[endIndex]
-        diskMap[endIndex] = -1
-        while endIndex > index && diskMap[endIndex] == -1
-            endIndex -= 1
-        end
+(diskMap.length - 1).downto(0) do |index|
+    sectionInfo = diskMap[index]
+    if sectionInfo.fileId == -1
+        next
     end
 
-    if index >= endIndex
-        break
+    (0...index).each do |checkIndex|
+        if diskMap[checkIndex].fileId != -1
+            next
+        end
+
+        if diskMap[checkIndex].numBlocks >= sectionInfo.numBlocks
+            diskMap.insert(checkIndex, DiskMapSection.new(sectionInfo.fileId, sectionInfo.numBlocks))
+            sectionInfo.fileId = -1
+            diskMap[checkIndex + 1].numBlocks -= sectionInfo.numBlocks
+            break
+        end
     end
 end
 
 # Calculate checksum
 checksum = 0
-diskMap.each_with_index do |value, index|
-    if value == -1
-        next
+blockIndex = 0
+diskMap.each do |sectionInfo|
+    if sectionInfo.fileId == -1
+        blockIndex += sectionInfo.numBlocks
+    else
+        sectionInfo.numBlocks.times do
+            checksum += (sectionInfo.fileId * blockIndex)
+            blockIndex += 1
+        end
     end
-
-    checksum += (value * index)
 end
 
 puts "Checksum: #{checksum}"
