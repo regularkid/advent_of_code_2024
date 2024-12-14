@@ -8,25 +8,48 @@ class Machine
     end
 
     def solve
-        minTokens = 0
-        minA = 0
-        minB = 0
-        (0..100).each do |a|
-            (0..100).each do |b|
-                if (a*@ax + b*@bx == @px) && (a*@ay + b*@by == @py)
-                    tokens = a*3 + b
-                    if minTokens == 0 || tokens < minTokens
-                        minTokens = tokens
-                        minA = a
-                        minB = b
-                    end
-                end
-            end
+        # Brute force
+        # minTokens = 0
+        # minA = 0
+        # minB = 0
+        # (0..100).each do |a|
+        #     (0..100).each do |b|
+        #         if (a*@ax + b*@bx == @px) && (a*@ay + b*@by == @py)
+        #             tokens = a*3 + b
+        #             if minTokens == 0 || tokens < minTokens
+        #                 minTokens = tokens
+        #                 minA = a
+        #                 minB = b
+        #             end
+        #         end
+        #     end
+        # end
+        # puts "#{to_s} = A:#{minA}, B:#{minB} = #{minTokens}"
+        # return minTokens
+
+        # Solve system of equations using substitution
+        #puts to_s
+        aNum = (@py * @bx) - (@px * @by)
+        aDen = (@ay * @bx) - (@ax * @by)
+        #puts "a: #{aNum} / #{aDen}"
+        if aNum % aDen != 0
+            return 0
         end
+        a = aNum / aDen
+        #puts "a: #{a}"
 
-        puts "#{to_s} = A:#{minA}, B:#{minB} = #{minTokens}"
+        bNum = @px - (@ax * a)
+        #puts "b: #{bNum} / #{@bx}"
+        if bNum % @bx != 0
+            return 0
+        end
+        b = bNum / @bx
+        #puts "b: #{b}"
 
-        return minTokens
+        tokens = a*3 + b
+        #puts "#{to_s} = A:#{a}, B:#{b} = #{tokens}"
+
+        return tokens
     end
 end
 
@@ -45,7 +68,7 @@ File.readlines("day_13_input.txt").each do |line|
         readState += 1
     when 2 then
         values = line.scan(/Prize: X=(\d+), Y=(\d+)/)[0].map(&:to_i)
-        px, py = values[0], values[1]
+        px, py = values[0] + 10000000000000, values[1] + 10000000000000
         machines.append(Machine.new(ax, ay, bx, by, px, py))
         readState += 1
     else
