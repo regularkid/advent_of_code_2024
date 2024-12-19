@@ -74,7 +74,64 @@ class Towels
         @memo_no.add(design)
         return false
     end
+
+    def solve_part_2
+        num_possible = 0
+        @memo_count = Hash.new
+        @memo_no = Set.new
+        @designs.each do |design|
+            puts "Checking #{design}"
+            num_possible += is_design_possible2(design)
+        end
+
+        puts "Part 2 Answer: #{num_possible}"
+    end
+
+    def is_design_possible2(design)
+        if @memo_count.key?(design)
+            return @memo_count[design]
+        end
+        
+        if @memo_no.include?(design)
+            return 0
+        end
+
+        if design.length == 0
+            return 1
+        end
+
+        count = 0
+        @patterns.each do |pattern|
+            if pattern.length > design.length
+                next
+            end
+
+            is_possible = true
+            pattern.chars.each_with_index do |c, index|
+                if c != design[index]
+                    is_possible = false
+                    break
+                end
+            end
+
+            if !is_possible
+                next
+            end
+
+            substr = design[pattern.length..]
+            #puts "Checking #{substr} for patterns #{pattern}"
+            count += is_design_possible2(substr)
+        end
+
+        if count == 0
+            @memo_no.add(design)
+        else
+            @memo_count[design] = count
+        end
+
+        return count
+    end
 end
 
 towels = Towels.new("day_19_input.txt")
-towels.solve_part_1
+towels.solve_part_2
