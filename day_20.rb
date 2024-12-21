@@ -41,7 +41,7 @@ class RaceTrack
         end
     end
 
-    def solve_part_1
+    def solve_part_1(max_cheat_distance)
         cur = Pos.new(@start.x, @start.y)
         time_at = Hash.new
         time_at[cur] = 0
@@ -60,11 +60,11 @@ class RaceTrack
         cheat_time_saved = Hash.new
         visited = Set.new
         visited.add(cur)
-        add_cheat_nodes(cur, time_at, cheat_time_saved)
+        add_cheat_nodes(cur, max_cheat_distance, time_at, cheat_time_saved)
         while cur != @end
             cur = get_next_node(cur, visited)
             visited.add(cur)
-            add_cheat_nodes(cur, time_at, cheat_time_saved)
+            add_cheat_nodes(cur, max_cheat_distance, time_at, cheat_time_saved)
         end
 
         cheat_time_counts = Hash.new
@@ -116,35 +116,30 @@ class RaceTrack
         return is_node_valid(node) && @grid[node.y][node.x] == "#"
     end
 
-    def add_cheat_nodes(cur, time_at, cheat_time_saved)
-        left = Pos.new(cur.x - 1, cur.y)
-        leftCheat = Pos.new(cur.x - 2, cur.y)
-        right = Pos.new(cur.x + 1, cur.y)
-        rightCheat = Pos.new(cur.x + 2, cur.y)
-        up = Pos.new(cur.x, cur.y - 1)
-        upCheat = Pos.new(cur.x, cur.y - 2)
-        down = Pos.new(cur.x, cur.y + 1)
-        downCheat = Pos.new(cur.x, cur.y + 2)
-
+    def add_cheat_nodes(cur, max_cheat_distance, time_at, cheat_time_saved)
         cheat_time_saved[cur] = []
+        (-max_cheat_distance..max_cheat_distance).each do |x|
+            (-max_cheat_distance..max_cheat_distance).each do |y|
+                if (x + y).abs != max_cheat_distance
+                    next
+                end
 
-        if is_node_walkable(leftCheat) && is_node_wall(left) && time_at[leftCheat] > time_at[cur]
-            cheat_time_saved[cur].append(time_at[leftCheat] - time_at[cur] - 2)
-        end
+                cheat_node = Pos.new(cur.x + x, cur.y + y)
+                if cheat_node.x == cur.x && cheat_node.y == cur.y
+                    next
+                end
+                
+                if !time_at.key?(cheat_node)
+                    next
+                end
 
-        if is_node_walkable(rightCheat) && is_node_wall(right) && time_at[rightCheat] > time_at[cur]
-            cheat_time_saved[cur].append(time_at[rightCheat] - time_at[cur] - 2)
-        end
-
-        if is_node_walkable(upCheat) && is_node_wall(up) && time_at[upCheat] > time_at[cur]
-            cheat_time_saved[cur].append(time_at[upCheat] - time_at[cur] - 2)
-        end
-        
-        if is_node_walkable(downCheat) && is_node_wall(down) && time_at[downCheat] > time_at[cur]
-            cheat_time_saved[cur].append(time_at[downCheat] - time_at[cur] - 2)
+                if is_node_walkable(cheat_node) && time_at[cheat_node] > (time_at[cur] + max_cheat_distance)
+                    cheat_time_saved[cur].append(time_at[cheat_node] - time_at[cur] - max_cheat_distance)
+                end
+            end
         end
     end
 end
 
 raceTrack = RaceTrack.new("day_20_input.txt")
-raceTrack.solve_part_1
+raceTrack.solve_part_1(2)
