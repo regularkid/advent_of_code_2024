@@ -84,6 +84,8 @@ class RaceTrack
             end
         end
 
+        p cheat_time_counts
+        p cheats_saving_at_least_100
         puts "Total time: #{time_at[@end]}"
         puts "Cheats saving at least 100 picoseconds: #{cheats_saving_at_least_100}"
     end
@@ -120,9 +122,10 @@ class RaceTrack
         cheat_time_saved[cur] = []
         (-max_cheat_distance..max_cheat_distance).each do |x|
             (-max_cheat_distance..max_cheat_distance).each do |y|
-                if (x + y).abs != max_cheat_distance
+                delta = x.abs + y.abs
+                if delta > max_cheat_distance
                     next
-                end
+                end                
 
                 cheat_node = Pos.new(cur.x + x, cur.y + y)
                 if cheat_node.x == cur.x && cheat_node.y == cur.y
@@ -133,8 +136,8 @@ class RaceTrack
                     next
                 end
 
-                if is_node_walkable(cheat_node) && time_at[cheat_node] > (time_at[cur] + max_cheat_distance)
-                    cheat_time_saved[cur].append(time_at[cheat_node] - time_at[cur] - max_cheat_distance)
+                if is_node_walkable(cheat_node) && time_at[cheat_node] > (time_at[cur] + delta)
+                    cheat_time_saved[cur].append(time_at[cheat_node] - time_at[cur] - delta)
                 end
             end
         end
@@ -142,4 +145,4 @@ class RaceTrack
 end
 
 raceTrack = RaceTrack.new("day_20_input.txt")
-raceTrack.solve_part_1(2)
+raceTrack.solve_part_1(20)
