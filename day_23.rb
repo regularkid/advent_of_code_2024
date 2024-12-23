@@ -40,7 +40,60 @@ class Network
         #p @triples
         puts "Part 1 Answer: #{@triples.length}"
     end
+
+    def solve_part_2
+        @sets = Set.new
+        @connections.each do |k, v|
+            v.each do |c|
+                set = Set.new
+                set.add(k)
+                set.add(c)
+                @sets.add(set)
+            end
+        end
+
+        #puts "BEFORE:"
+        #p @sets
+
+        @connections.each do |k, v|
+            @sets.each do |set|
+                # Already part of this set?
+                if set.include?(k)
+                    next
+                end
+
+                # Is connected to all comps in this set?
+                isConnectedToAll = true
+                set.each do |c|
+                    if !v.include?(c)
+                        isConnectedToAll = false
+                        break
+                    end
+                end
+
+                # Add to this set
+                if isConnectedToAll
+                    set.add(k)
+                end
+            end
+        end
+
+        #puts "AFTER:"
+        #p @sets
+
+        longest = 0
+        longest_set = nil
+        @sets.each do |set|
+            if set.size > longest
+                longest = set.size
+                longest_set = set
+            end
+        end
+
+        puts "Part 2 Answer: #{longest_set.to_a.sort.join(",")}"
+    end
 end
 
 network = Network.new("day_23_input.txt")
 network.solve_part_1
+network.solve_part_2
